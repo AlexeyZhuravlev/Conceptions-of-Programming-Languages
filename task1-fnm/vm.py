@@ -38,6 +38,7 @@ COMMAND_PUSH = 4
 COMMAND_CALL = 5
 COMMAND_FUNCB = 6
 COMMAND_FUNCE = 7
+COMMAND_TERMINATE = 8
 
 IP_INDEX = 0
 SP_INDEX = 1
@@ -72,20 +73,20 @@ class Interpreter:
     def mov(self, dest, src, src_access):
         src_value = self.get_value(self.memory, src, src_access)
         self.memory.write_word(dest, src_value)
-        next_command()
+        self.next_command()
 
     def add(self, dest, addition, addition_access):
         addition_value = self.get_value(self.memory, addition, addition_access)
         self.memory.write_word(dest, memory.read_word(dest) + addition_value)
-        next_command()
+        self.next_command()
 
     def next_command(self):
-        self.add(self.ip_address, 1, ARG_ACCESS_IMMEDIATE)
+        self.add(self.ip_address, INSTRUCTION_SIZE, ARG_ACCESS_IMMEDIATE)
 
     def sub(self, dest, sub, sub_access):
         sub_value = self.get_value(memory, sub, sub_access)
         self.memory.write_word(dest, self.memory.read_word(dest) - sub_value)
-        next_command()
+        self.next_command()
     
     def jump(self, dest, dest_access):
         instruction_number = self.get_value(dest, dest_access)
@@ -96,16 +97,16 @@ class Interpreter:
         if value >= 0:
             self.jump(dest, dest_access)
         else:
-            next_command()
+            self.next_command()
 
     def pop(self):
         self.add(self.sp_address(), 1, ARG_ACCESS_IMMEDIATE)
-        next_command()
+        self.next_command()
 
     def push(self, val, val_access):
         self.sub(self.sp_adress(), 1, ARG_ACCESS_IMMEDIATE)
         self.memory.write_word(self.sp_value(), self.get_value(val, val_access))
-        next_command()
+        self.next_command()
     
     def call(self, val):
         self.memory.write_word(self.ip_address(), self.function_startpoints[val])
@@ -118,12 +119,38 @@ class Interpreter:
     def func_end(self):
         self.reading_function = False
 
-    def interpret_next_command(instruction: int, argument1: int, argument2: int):
-        instruction = self.get_value(self., first_arg_access)
-        instruction_code = intstruction & 0xffff0000 >> 4
+    def interpret_next_command(self):
+        instruction = self.get_value(self.ip_value(), ARG_ACCESS_DIRECT)
+        argument1 = self.get_value(self.ip_value() + WORD_SIZE, ARG_ACCESS_DIRECT)
+        argument2 = self.get_value(self.ip_value() + 2 * WORD_SIZE, ARG_ACCESS_DIRECT)
+
+        instruction_code = instruction & 0xffff0000 >> 4
         first_arg_access = instruction & 0x0000ff00 >> 2
         second_arg_access = instruction & 0x000000ff
+
         if instruction_code == COMMAND_MOV:
             self.mov(argument1, argument2, second_arg_access)
         elif instruction_code == COMMAND_ADD:
-            self.add()
+            self.add(argument1, argument2, second_arg_access)
+        elif instruction_code == COMMAND_CALL:
+            self.call(argument1)
+        elif instruction_code == COMMAND_SUB:
+            self.sub(argument1, argument2, second_arg_access)
+        elif instruction_code == COMMAND_POP:
+            self.pop()
+        elif instruction_code == COMMAND_PUSH:
+            self.push(argument1, first_arg_access)
+        elif instruction_code == COMMAND_FUNCB:
+            self.func_begin(argument1, first_arg_access)
+        elif instruction_code == COMMAND_FUNCE:
+            self.func_end()
+        elif instruction_code == COMMAND_TERMINATE:
+            return True
+        return False
+
+    def run_execution(self):
+        while self.interpret_next_command():
+            if self.reading_function:
+                while self.reading_function:
+                    self.next_command()
+
