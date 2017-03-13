@@ -179,13 +179,12 @@ class Interpreter:
             self.read(argument1, first_arg_access)
             return True
 
-
     def run_execution(self):
         while self.interpret_next_command():
             pass
 
 
-if( len(sys.argv) < 2 ):
+if len(sys.argv) < 2:
     print "Specify binary filename"
 
 MEMORY_SIZE = 1000000
