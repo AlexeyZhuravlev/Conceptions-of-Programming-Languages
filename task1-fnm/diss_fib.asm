@@ -24,9 +24,12 @@ mov 3 **1
 pop
 jump *3
 funce
+putstr Hello! This programm will calclulate the n-th member of the fib-sequence [0, 1, 1, 2, 3, 5, 8, ... ]
+putstr Enter number n:
 read 3
 push *3
 call 1
 pop
+putstr Your answer is:
 print *2
 term
