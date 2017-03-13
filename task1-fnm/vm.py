@@ -17,6 +17,7 @@ COMMAND_JUMP = 9
 COMMAND_RJGZ = 10
 COMMAND_PRINT = 11
 COMMAND_READ = 12
+COMMAND_PUTSTR = 13
 
 IP_INDEX = 0
 SP_INDEX = 1
@@ -33,8 +34,9 @@ class Memory:
 
 
 class Interpreter:
-    def __init__(self, memory):
+    def __init__(self, memory, static_offset):
         self.memory = memory
+        self.static_offset = static_offset
         self.function_startpoints = {}
         self.reading_function = False
 
@@ -127,6 +129,15 @@ class Interpreter:
         self.memory.write_word(address, read_value)
         self.next_command()
 
+    def print_static_string(self, arg):
+        static_address = self.memory.read_word(self.static_offset + arg)
+        strln = self.memory.read_word(self.static_offset + static_address)
+        str = ""
+        for i in range(strln):
+            str += chr(self.memory.read_word(self.static_offset + static_address + i + 1))
+        print str
+        self.next_command()
+
     def interpret_next_command(self):
         instruction = self.get_value(self.ip_value(), 1)
         first_arg_access = self.get_value(self.ip_value() + 1, 1)
@@ -176,6 +187,9 @@ class Interpreter:
         elif instruction == COMMAND_READ:
             self.read(argument1, first_arg_access)
             return True
+        elif instruction == COMMAND_PUTSTR:
+            self.print_static_string(argument1)
+            return True
 
     def run_execution(self):
         while self.interpret_next_command():
@@ -190,7 +204,8 @@ memory = Memory(MEMORY_SIZE)
 memory.write_word(IP_INDEX, NUMBER_OF_REGISTERS)
 memory.write_word(SP_INDEX, MEMORY_SIZE)
 code = np.fromfile(sys.argv[1], dtype=np.int32)
-for i in range(len(code)):
-    memory.write_word(NUMBER_OF_REGISTERS + i, code[i])
-interpreter = Interpreter(memory)
+code_size = code[0]
+for i in range(1, len(code)):
+    memory.write_word(NUMBER_OF_REGISTERS + i - 1, code[i])
+interpreter = Interpreter(memory, NUMBER_OF_REGISTERS + code_size)
 interpreter.run_execution()
