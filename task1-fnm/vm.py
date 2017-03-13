@@ -21,7 +21,6 @@ COMMAND_READ = 12
 IP_INDEX = 0
 SP_INDEX = 1
 
-
 class Memory:
     def __init__(self, memory_size):
         self.memory = np.zeros(memory_size, dtype=np.int32)
@@ -129,7 +128,6 @@ class Interpreter:
         self.next_command()
 
     def interpret_next_command(self):
-
         instruction = self.get_value(self.ip_value(), 1)
         first_arg_access = self.get_value(self.ip_value() + 1, 1)
         argument1 = self.get_value(self.ip_value() + 2, 1)
@@ -187,7 +185,7 @@ class Interpreter:
 if len(sys.argv) < 2:
     print "Specify binary filename"
 
-MEMORY_SIZE = 1000000
+MEMORY_SIZE = 10000000
 memory = Memory(MEMORY_SIZE)
 memory.write_word(IP_INDEX, NUMBER_OF_REGISTERS)
 memory.write_word(SP_INDEX, MEMORY_SIZE)
