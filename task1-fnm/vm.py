@@ -16,6 +16,7 @@ COMMAND_TERMINATE = 8
 COMMAND_JUMP = 9
 COMMAND_RJGZ = 10
 COMMAND_PRINT = 11
+COMMAND_READ = 12
 
 IP_INDEX = 0
 SP_INDEX = 1
@@ -121,6 +122,12 @@ class Interpreter:
         print value
         self.next_command()
 
+    def read(self, dest, dest_access):
+        address = self.get_value(dest, dest_access)
+        read_value = int(input())
+        self.memory.write_word(address, read_value)
+        self.next_command()
+
     def interpret_next_command(self):
 
         instruction = self.get_value(self.ip_value(), 1)
@@ -167,6 +174,9 @@ class Interpreter:
             return False
         elif instruction == COMMAND_PRINT:
             self.print_(argument1, first_arg_access)
+            return True
+        elif instruction == COMMAND_READ:
+            self.read(argument1, first_arg_access)
             return True
 
 

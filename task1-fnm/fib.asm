@@ -24,7 +24,8 @@ mov r1 **sp
 pop
 jump *r1
 funce
-push 6
+read r1
+push *r1
 call 1
 pop
 print *rv

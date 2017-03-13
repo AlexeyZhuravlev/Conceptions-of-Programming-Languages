@@ -1,7 +1,7 @@
 import numpy as np
 import sys
 
-COMMAND_CODES = { "mov": 0, "add": 1, "sub": 2, "pop": 3, "push": 4, "call": 5, "funcb": 6, "funce": 7, "term": 8, "jump": 9, "rjgz": 10, "print": 11 }
+COMMAND_CODES = { "mov": 0, "add": 1, "sub": 2, "pop": 3, "push": 4, "call": 5, "funcb": 6, "funce": 7, "term": 8, "jump": 9, "rjgz": 10, "print": 11, "read": 12 }
 REGISTRIES = {"ip": 0, "sp": 1, "rv": 2, "r1": 3, "r2": 4, "r3": 5, "r4": 6, "r5": 7}
 
 def represents_int(s):
