@@ -1,8 +1,8 @@
 import numpy as np
 import sys
 
-COMMAND_CODES = { "mov": 0, "add": 1, "sub": 2, "pop": 3, "push": 4, "call": 5, "funcb": 6, "funce": 7, "term": 8, "jump": 9, "rjgz": 10 }
-REGISTRIES = {"ip": 0, "sp": 1, "rv": 3, "r1": 4, "r2": 5, "r3": 6, "r4": 7, "r5": 8}
+COMMAND_CODES = { "mov": 0, "add": 1, "sub": 2, "pop": 3, "push": 4, "call": 5, "funcb": 6, "funce": 7, "term": 8, "jump": 9, "rjgz": 10, "print": 11 }
+REGISTRIES = {"ip": 0, "sp": 1, "rv": 2, "r1": 3, "r2": 4, "r3": 5, "r4": 6, "r5": 7}
 
 def represents_int(s):
     try: 
@@ -39,9 +39,9 @@ def generate_bytecode(source_filename):
             second_arg = 0
             second_at = 0
             if len(tokens) > 1:
-                first_arg, first_at = get_arg_with_access_type(tokens[1])
+                first_at, first_arg = get_arg_with_access_type(tokens[1])
             if len(tokens) > 2:
-                second_arg, second_at = get_arg_with_access_type(tokens[2])
+                second_at, second_arg = get_arg_with_access_type(tokens[2])
             bytecode.append(code)
             bytecode.append(first_at)
             bytecode.append(first_arg)
@@ -56,4 +56,4 @@ if len(sys.argv) < 2:
     print "Specify output filename"
 
 bytecode = generate_bytecode(sys.argv[1])
-bytecode.tofile(sys.argv[1])
+bytecode.tofile(sys.argv[2])
